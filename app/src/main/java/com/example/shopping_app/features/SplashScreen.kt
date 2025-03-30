@@ -32,7 +32,7 @@ fun SplashScreen(
     navController: NavHostController
 ) {
     LaunchedEffect(Unit) {
-        delay(3000)
+        delay(2000)
         navController.navigate(HomeRoute) {
             popUpTo(SplashRoute) { inclusive = true }
         }
@@ -60,11 +60,6 @@ private fun Body(modifier: Modifier) {
                 fontWeight = FontWeight.ExtraBold
             )
 
-        )
-        Icon(
-            imageVector = Icons.Filled.Star, contentDescription = "icon",
-            tint = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.height(50.dp).width(50.dp)
         )
 
 
