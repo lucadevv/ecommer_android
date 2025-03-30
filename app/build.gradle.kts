@@ -60,7 +60,10 @@ dependencies {
 
     //--------------[navigation]--------------------
     implementation(libs.androidx.navigation)
-    //--------------[json serialization]--------------------
+    //--------------[json serialization]------------
     implementation(libs.kotlinx.serialization)
+    //--------------[coil]--------------------------
+    implementation(libs.coil)
+    implementation(libs.coil.network)
 
 }

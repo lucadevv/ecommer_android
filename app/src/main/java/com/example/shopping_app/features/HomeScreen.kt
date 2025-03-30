@@ -1,5 +1,6 @@
 package com.example.shopping_app.features
 
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerDefaults
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
@@ -23,6 +25,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,12 +35,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import coil3.compose.AsyncImage
 import com.example.shopping_app.core.theme.Shopping_appTheme
+import kotlinx.coroutines.delay
 import kotlin.math.absoluteValue
 
 
@@ -59,9 +65,22 @@ fun HomeScreen(
 @Composable
 private fun Body(modifier: Modifier) {
     var searchText by remember { mutableStateOf("") }
-    val pagerState = rememberPagerState(pageCount = {
-        4
-    })
+
+    val listImage = listOf(
+        "https://cdn.pixabay.com/photo/2021/01/08/10/57/shopping-5899638_1280.jpg",
+        "https://cdn.pixabay.com/photo/2018/09/14/03/50/center-3676219_1280.jpg",
+        "https://cdn.pixabay.com/photo/2025/03/19/15/04/lotus-9480927_1280.jpg",
+        "https://cdn.pixabay.com/photo/2022/10/11/16/43/french-bulldog-7514725_1280.jpg"
+    )
+    val infinitePageCount = Int.MAX_VALUE
+    val startPage = infinitePageCount / 2
+    val pagerState = rememberPagerState(initialPage = startPage, pageCount = { infinitePageCount })
+    LaunchedEffect(pagerState) {
+        while (true) {
+            delay(3000) // Cambia cada 3 segundos
+            pagerState.animateScrollToPage(pagerState.currentPage + 1)
+        }
+    }
     Column(
         modifier = modifier
     ) {
@@ -76,7 +95,16 @@ private fun Body(modifier: Modifier) {
         Spacer(
             modifier = Modifier.height(16.dp)
         )
-        HorizontalPager(state = pagerState) { page ->
+
+        HorizontalPager(
+            state = pagerState,
+            flingBehavior = PagerDefaults.flingBehavior(
+                state = pagerState,
+                snapAnimationSpec = tween(durationMillis = 600)
+            )
+        ) { page ->
+            val actualIndex = page % listImage.size
+            val item = listImage[actualIndex]
             Card(
                 Modifier
                     .height(200.dp)
@@ -94,22 +122,16 @@ private fun Body(modifier: Modifier) {
                         // Efecto de profundidad (3D)
                         val rotationX = lerp(-30f, 0f, 1f - pageOffset)
 
-
                         // Efecto de desplazamiento
                         translationX = pageOffset * 100f
                     }
             ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color(0xFF6200EE))
-                ) {
-                    Text(
-                        text = "Página ${page + 1}",
-                        color = Color.White,
-                        modifier = Modifier.align(Alignment.Center)
-                    )
-                }
+                AsyncImage(
+                    model = item,
+                    contentDescription = null,
+                    contentScale = ContentScale.FillWidth
+                )
+
             }
         }
         Spacer(
